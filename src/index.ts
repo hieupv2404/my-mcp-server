@@ -65,8 +65,7 @@ export class MyMCP extends McpAgent<Env> {
 
 		this.server.tool(
 			"kaia chain",
-			"status of the kaia chain",
-			
+			"status of the kaia chain - about: gas, supply, marrket cap, burning, fee",
 			async ({}) => {
 				try {
 					const options = {
@@ -96,7 +95,185 @@ export class MyMCP extends McpAgent<Env> {
 				}
 			}
 		);
-		
+
+		this.server.tool(
+			"total supply kaia",
+			"total supply of the kaia chain to make chart",
+			{ 
+				day: z.number().default(7),
+				size: z.number().default(100)
+			},
+			async ({ day, size }) => {
+				try {
+					const options = {
+						method: 'GET',
+					};
+
+					const response = await fetch(
+						`https://api-square.kaia.io/api/v1/kaia/supply?from=&days=${day}&size=${size}`,
+						options
+					);
+
+					if (!response.ok) {
+						throw new Error(`API request failed with status ${response.status}`);
+					}
+
+					const data = await response.json();
+					return {
+						content: [{ type: "text", text: JSON.stringify(data, null, 2) }]
+					};
+				} catch (error) {
+					return {
+						content: [{ 
+							type: "text", 
+							text: `Error fetching total supply of kaia chain: ${error instanceof Error ? error.message : 'Unknown error'}`
+						}]
+					};
+				}
+			}
+		);
+
+		this.server.tool(
+			"transaction info kaia",
+			"tx info of the kaia chain to make chart",
+			{ 
+				day: z.number().default(7),
+			},
+			async ({ day }) => {
+				try {
+					const options = {
+						method: 'GET',
+					};
+
+					const response = await fetch(
+						`https://api-square.kaia.io/api/v1/status/tx_info?days=${day}`,
+						options
+					);
+
+					if (!response.ok) {
+						throw new Error(`API request failed with status ${response.status}`);
+					}
+
+					const data = await response.json();
+					return {
+						content: [{ type: "text", text: JSON.stringify(data, null, 2) }]
+					};
+				} catch (error) {
+					return {
+						content: [{ 
+							type: "text", 
+							text: `Error fetching transaction info of kaia chain: ${error instanceof Error ? error.message : 'Unknown error'}`
+						}]
+					};
+				}
+			}
+		);
+
+		this.server.tool(
+			"accounts count kaia",
+			"total accounts count of the kaia chain to make chart",
+			{ 
+				month: z.number().default(12),
+			},
+			async ({ month }) => {
+				try {
+					const options = {
+						method: 'GET',
+					};
+
+					const response = await fetch(
+						`https://api-square.kaia.io/api/v1/status/account?months=${month}`,
+						options
+					);
+
+					if (!response.ok) {
+						throw new Error(`API request failed with status ${response.status}`);
+					}
+
+					const data = await response.json();
+					return {
+						content: [{ type: "text", text: JSON.stringify(data, null, 2) }]
+					};
+				} catch (error) {
+					return {
+						content: [{ 
+							type: "text", 
+							text: `Error fetching accounts count of kaia chain: ${error instanceof Error ? error.message : 'Unknown error'}`
+						}]
+					};
+				}
+			}
+		);
+
+		this.server.tool(
+			"council members kaia",
+			"get all council members of the kaia chain",
+			async ({ }) => {
+				try {
+					const options = {
+						method: 'GET',
+					};
+
+					const response = await fetch(
+						`https://api-square.kaia.io/api/v1/councils?order=staking`,
+						options
+					);
+
+					if (!response.ok) {
+						throw new Error(`API request failed with status ${response.status}`);
+					}
+
+					const data = await response.json();
+					return {
+						content: [{ type: "text", text: JSON.stringify(data, null, 2) }]
+					};
+				} catch (error) {
+					return {
+						content: [{ 
+							type: "text", 
+							text: `Error fetching council member of kaia chain: ${error instanceof Error ? error.message : 'Unknown error'}`
+						}]
+					};
+				}
+			}
+		);
+
+		this.server.tool(
+			"staking info kaia by council",
+			"staking info kaia by council with apy to make chart",
+			{ 
+				councilId: z.number().default(-1), 
+				day: z.number().default(30),
+			},
+			async ({ councilId, day }) => {
+				try {
+					const options = {
+						method: 'GET',
+					};
+
+					const response = await fetch(
+						`https://api-square.kaia.io/api/v1/status/staking?cid=${councilId}&days=${day}`,
+						options
+					);
+
+					if (!response.ok) {
+						throw new Error(`API request failed with status ${response.status}`);
+					}
+
+					const data = await response.json();
+					return {
+						content: [{ type: "text", text: JSON.stringify(data, null, 2) }]
+					};
+				} catch (error) {
+					return {
+						content: [{ 
+							type: "text", 
+							text: `Error fetching staking by counctil on kaia chain: ${error instanceof Error ? error.message : 'Unknown error'}`
+						}]
+					};
+				}
+			}
+		);
 		
 		// Simple addition tool
 		this.server.tool(
